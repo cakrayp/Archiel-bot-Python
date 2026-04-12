@@ -1,17 +1,17 @@
 # Archiel-bot
-Hai
-___
-### How to Use this Discord BOT
-1. You must to install packages with command below.
-```
-$ pip install - requirements.txt
-```
-2. Then, You must set up the config with add new file `.env` as environment, Example usage in file `env.example`
-3. After do that, You can run this program with command in below.
-```
-$ python index.py
-```
-4. Enjoy...
+A "Reply to Hi message" Discord (self-)bot made with Discord.py(-self)
+
+## 🚀 Deploy using "normal" method
+1. Clone this repository (you probably already know how to do it)
+2. Create a `.venv` (`python -m venv .venv`)
+3. Activate `.venv` (`source .venv/bin/activate` for Linux users)
+4. Install all dependencies (`pip install -r requirements.txt`)
+5. Open `.env` and configure every environment variable value
+6. Run `python index.py`
+
+## 🐋 Deploy using Docker
+1. Do the 5th step at the instruction above
+2. Run `docker run --env-file .env ghcr.io/sprucecellodev125/archiel-bot:latest` (Source code from [@Miru](https://github.com/sprucecellodev125/Archiel-bot))
 
 ___
 - Source By [@Miru](https://github.com/sprucecellodev125/Archiel-bot)
