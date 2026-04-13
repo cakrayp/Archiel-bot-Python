@@ -65,7 +65,7 @@ async def on_message(message):
     logger(
         "[MESSAGE RECEIVED]:",
         f'Message received from "{message.author.name}"' +
-        f' ({message.author.display_name if message.author.display_name != message.author.name else ''})',
+        f' ({message.author.display_name})' if message.author.display_name != message.author.name else '',
         f'with content "{message.content}"' if message.content else 'with no content',
         f'in server "{message.guild.name}"' if message.guild else 'in Direct Message',
         f'and ID "{message.author.id}"'
