@@ -33,7 +33,9 @@ from dotenv import load_dotenv
 from logger import logger
 import discord
 import time
+import random
 import os
+import sys
 load_dotenv()
 
 # Ambil token dan target user ID dari environment variables
@@ -71,6 +73,10 @@ async def on_message(message):
         f'and ID "{message.author.id}"'
     )
 
+    # Hindari merespons pesan yang dikirim oleh bot itu sendiri
+    if message.author.id == client.user.id:
+        return
+
     # Menghindari pengiriman pesan berulang jika sudah ada permintaan untuk mengirim pesan
     if is_request_to_sent_message == True:
         return
@@ -79,7 +85,21 @@ async def on_message(message):
     cek_latency_commands = ['ping', 'Ping', 'PING']
     if message.author.id == MY_USER_ID and message.content in cek_latency_commands:
         is_request_to_sent_message = True
-        await message.channel.send(f"**Pong!** My latency is {round(client.latency * 1000)}ms ({client.latency:.2f}s)\n**Note:** This is a test message for latency check.")
+
+        # Buat pesan latency dengan format yang jelas dan informatif
+        latencyText = ""
+        latencyText += f"**Pong!** My latency is {round(client.latency * 1000)}ms ({client.latency:.2f}s)\n"
+        latencyText += f"API Latency: {round(client.ws.latency * 1000)}ms\n"
+        latencyText += f"Python Version: {sys.version}\n"
+        latencyText += f"Discord.py Version: {discord.__version__}\n\n"
+        # latencyText += "**Note:** This is a test message for latency check.\n"
+        latencyText += "**Note:** This latency is calculated based on the time it takes for the bot to send a heartbeat to the Discord server and receive a response. It may vary based on network conditions and server load."
+        latencyText = latencyText.strip()
+
+        # Kirim pesan latency ke channel yang sama
+        await message.channel.send(latencyText)
+
+        # Log pesan yang dikirim
         logger(
             "[MESSAGE SENT]:",
             "[OWNER]:",
@@ -87,11 +107,10 @@ async def on_message(message):
         )
         time.sleep(6)  # Tambahkan delay sebelum mengizinkan pengiriman pesan berikutnya (opsional) => 6 detik
         is_request_to_sent_message = False
-        return
 
-    # Cek apakah pesan berasal dari bot itu sendiri atau bukan dari target user ID
-    if message.author.id == client.user.id:
-        return
+        return  # Menghentikan eksekusi lebih lanjut untuk memastikan hanya merespons perintah latency check dan tidak memproses pesan lain dari owner
+
+    # Hanya merespons pesan dari user dengan ID TARGET_USER_ID
     if message.author.id != TARGET_USER_ID:
         return
 
@@ -104,15 +123,26 @@ async def on_message(message):
         # Kirim balasan ke channel yang sama
         is_request_to_sent_message = True
         time.sleep(6)  # Tambahkan delay sebelum mengirim balasan (opsional) => 6 detik
-        await message.channel.send(f"Hai juga <@{TARGET_USER_ID}>")
-        # Log pesan yang dikirim
+        target_user_id = message.author.id  # "TARGET_USER_ID" sudah didefinisikan sebagai global variable, tapi kita bisa ambil langsung dari 'message.author.id' untuk memastikan kita merespons ke user yang benar
+        randomGreetings = [
+            f"Hai <@{target_user_id}>",
+            f"Hai juga <@{target_user_id}>",
+            f"Hai juga anomali <@{target_user_id}>",
+        ];
+        greetingMessage = random.choice(randomGreetings)
+        greetingMessage = greetingMessage if message.content.lower() == 'hai' else greetingMessage.replace('Hai', 'Hi')
+        await message.channel.send(greetingMessage)
+
+        # Setelah mengirim pesan, atur is_request_to_sent_message kembali ke False untuk memungkinkan pengiriman pesan berikutnya...
+        is_request_to_sent_message = False
+
+        # Log pesan yang dikirim.
         logger(
             "[MESSAGE SENT]:",
             "[TARGET USER]:",
             f'Message has been sent to "{message.author.name}" with ID "{message.author.id}"'
         )
-        is_request_to_sent_message = False
-        return
+        return  # Menghentikan eksekusi lebih lanjut untuk memastikan hanya merespons pesan yang sesuai dengan filter dan tidak memproses pesan lain dari target user
 
 
 # Jalankan bot dengan token yang diambil dari environment variables
