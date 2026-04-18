@@ -14,9 +14,14 @@ use_save_logs = True if os.getenv('SAVE_LOGS', 'False').lower() in ['true', 'Tru
 
 # +---------[ Logger Folder ]---------+
 
-logger_folder_path = Path(current_path, "discord_logs")
-if not logger_folder_path.exists() and use_save_logs == True:
+logger_folder_path = Path(current_path, "history-logs")
+if use_save_logs == True:
+    # Use for saving logs of message history for discord channels (if SAVE_LOGGER is true).
+    # but if the folder does not exist, it will create a new folder named "history-logs" in the current directory.
     # logger_folder_path.mkdir(parents=True, exist_ok=True)
+    logger_folder_path = Path(current_path, "discord-logs")
+if not logger_folder_path.exists():
+    # Use default logger folder if the specified one does not exist
     os.mkdir(logger_folder_path)
 
 
@@ -37,7 +42,7 @@ def loggerSetup(*message, **options):
     iso_date = datetime.now().astimezone().date().isoformat()
 
     # Default Logger Path if you does not use this paramenter.
-    default_loggerPath = Path(current_path, "temp", f"logger {iso_date}.log")
+    default_loggerPath = Path(logger_folder_path, f"logger {iso_date}.log")
 
     # Logger Path check
     isTypeStrOrPath = (isinstance(options.get('log_file', False), Path) or isinstance(options.get('log_file', False), str))
@@ -53,18 +58,20 @@ def loggerSetup(*message, **options):
                 f.write(log_entry)
     except Exception as e:
         print(f"Logging error: {e}")
+        print(e)
 
 # Example Usage
 # loggerSetup("This is a log message.", use_iso_date=True, save_logger=True)
 
 # +---------[ Export Logger Function ]---------+
 
+# Default Logger setup for 'index.py'
 def logger(*message):
     dateCurrent = datetime.now().astimezone().date().isoformat()
-    log_file = Path(current_path, "discord_logs", f"logger {dateCurrent}.log")
+    log_file = Path(logger_folder_path, f"logger {dateCurrent}.log")
     loggerSetup(
         *message,
-        log_file=log_file,
-        use_iso_date=True,
-        save_logger=use_save_logs
+        log_file=log_file,  # Use the default log file path based on the current date in the logger folder.
+        use_iso_date=True,  # Use ISO date format in the log entry for better readability and consistency.
+        save_logger=use_save_logs   # Use the global variable to determine whether to save logs or not
     )
