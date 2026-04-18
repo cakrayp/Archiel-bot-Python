@@ -1,5 +1,6 @@
 .venv
 .env
 discord-logs/
+history-logs/
 __pycache__/
 *.log
