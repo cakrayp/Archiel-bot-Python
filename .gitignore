@@ -1,5 +1,5 @@
 .venv
 .env
-discord_logs/
+discord-logs/
 __pycache__/
 *.log
