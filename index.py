@@ -30,7 +30,9 @@ Events:
 """
 
 from dotenv import load_dotenv
-from logger import logger
+from pathlib import Path
+from datetime import datetime
+from logger import LoggerSetup
 import discord
 import time
 import random
@@ -43,6 +45,25 @@ TOKEN = os.getenv('TOKEN').strip()
 TARGET_USER_ID = int(os.getenv('TARGET_USER_ID'))
 MY_USER_ID = int(os.getenv('MY_USER_ID'))
 client = discord.Client()
+
+# Configuration default Logger Setup
+use_save_logs = True if os.getenv('SAVE_LOGS', 'False').lower() in ['true', 'True'] else False
+logger_file_path = None
+if use_save_logs == True:
+    # Use for saving logs of message history for discord channels (if SAVE_LOGS is true).
+    # but if the folder does not exist, it will create a new folder named "history-logs" in the current directory.
+    # logger_folder_path.mkdir(parents=True, exist_ok=True)
+    current_path = os.getcwd()
+    iso_date = datetime.now().astimezone().date().isoformat()
+    logger_file_path = Path(current_path, "discord-logs", f"logger {iso_date}.log")
+
+# Logger Setup
+logger = LoggerSetup(
+    log_file=logger_file_path,
+    use_iso_date=True,
+    save_logger=use_save_logs
+).logger
+
 
 # Variable Local.
 is_request_to_sent_message = False
